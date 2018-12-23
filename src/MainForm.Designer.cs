@@ -962,22 +962,22 @@
             // rbTexShips1
             // 
             this.rbTexShips1.AutoSize = true;
+            this.rbTexShips1.Checked = true;
             this.rbTexShips1.Location = new System.Drawing.Point(93, 19);
             this.rbTexShips1.Name = "rbTexShips1";
             this.rbTexShips1.Size = new System.Drawing.Size(44, 17);
             this.rbTexShips1.TabIndex = 8;
+            this.rbTexShips1.TabStop = true;
             this.rbTexShips1.Text = "Bad";
             this.rbTexShips1.UseVisualStyleBackColor = true;
             // 
             // rbTexShips2
             // 
             this.rbTexShips2.AutoSize = true;
-            this.rbTexShips2.Checked = true;
             this.rbTexShips2.Location = new System.Drawing.Point(143, 19);
             this.rbTexShips2.Name = "rbTexShips2";
             this.rbTexShips2.Size = new System.Drawing.Size(56, 17);
             this.rbTexShips2.TabIndex = 9;
-            this.rbTexShips2.TabStop = true;
             this.rbTexShips2.Text = "Worse";
             this.rbTexShips2.UseVisualStyleBackColor = true;
             // 
@@ -1017,22 +1017,22 @@
             // rbTexStationE1
             // 
             this.rbTexStationE1.AutoSize = true;
+            this.rbTexStationE1.Checked = true;
             this.rbTexStationE1.Location = new System.Drawing.Point(93, 19);
             this.rbTexStationE1.Name = "rbTexStationE1";
             this.rbTexStationE1.Size = new System.Drawing.Size(44, 17);
             this.rbTexStationE1.TabIndex = 8;
+            this.rbTexStationE1.TabStop = true;
             this.rbTexStationE1.Text = "Bad";
             this.rbTexStationE1.UseVisualStyleBackColor = true;
             // 
             // rbTexStationE2
             // 
             this.rbTexStationE2.AutoSize = true;
-            this.rbTexStationE2.Checked = true;
             this.rbTexStationE2.Location = new System.Drawing.Point(143, 19);
             this.rbTexStationE2.Name = "rbTexStationE2";
             this.rbTexStationE2.Size = new System.Drawing.Size(56, 17);
             this.rbTexStationE2.TabIndex = 9;
-            this.rbTexStationE2.TabStop = true;
             this.rbTexStationE2.Text = "Worse";
             this.rbTexStationE2.UseVisualStyleBackColor = true;
             // 
@@ -1072,22 +1072,22 @@
             // rbTexStationI1
             // 
             this.rbTexStationI1.AutoSize = true;
+            this.rbTexStationI1.Checked = true;
             this.rbTexStationI1.Location = new System.Drawing.Point(93, 19);
             this.rbTexStationI1.Name = "rbTexStationI1";
             this.rbTexStationI1.Size = new System.Drawing.Size(44, 17);
             this.rbTexStationI1.TabIndex = 8;
+            this.rbTexStationI1.TabStop = true;
             this.rbTexStationI1.Text = "Bad";
             this.rbTexStationI1.UseVisualStyleBackColor = true;
             // 
             // rbTexStationI2
             // 
             this.rbTexStationI2.AutoSize = true;
-            this.rbTexStationI2.Checked = true;
             this.rbTexStationI2.Location = new System.Drawing.Point(143, 19);
             this.rbTexStationI2.Name = "rbTexStationI2";
             this.rbTexStationI2.Size = new System.Drawing.Size(56, 17);
             this.rbTexStationI2.TabIndex = 9;
-            this.rbTexStationI2.TabStop = true;
             this.rbTexStationI2.Text = "Worse";
             this.rbTexStationI2.UseVisualStyleBackColor = true;
             // 
