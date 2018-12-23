@@ -732,12 +732,10 @@
             // rbTexEnv3
             // 
             this.rbTexEnv3.AutoSize = true;
-            this.rbTexEnv3.Checked = true;
             this.rbTexEnv3.Location = new System.Drawing.Point(205, 19);
             this.rbTexEnv3.Name = "rbTexEnv3";
             this.rbTexEnv3.Size = new System.Drawing.Size(69, 17);
             this.rbTexEnv3.TabIndex = 7;
-            this.rbTexEnv3.TabStop = true;
             this.rbTexEnv3.Text = "Minecraft";
             this.rbTexEnv3.UseVisualStyleBackColor = true;
             // 
@@ -754,10 +752,12 @@
             // rbTexEnv2
             // 
             this.rbTexEnv2.AutoSize = true;
+            this.rbTexEnv2.Checked = true;
             this.rbTexEnv2.Location = new System.Drawing.Point(143, 19);
             this.rbTexEnv2.Name = "rbTexEnv2";
             this.rbTexEnv2.Size = new System.Drawing.Size(56, 17);
             this.rbTexEnv2.TabIndex = 9;
+            this.rbTexEnv2.TabStop = true;
             this.rbTexEnv2.Text = "Worse";
             this.rbTexEnv2.UseVisualStyleBackColor = true;
             // 
@@ -852,22 +852,22 @@
             // rbTexNPC1
             // 
             this.rbTexNPC1.AutoSize = true;
+            this.rbTexNPC1.Checked = true;
             this.rbTexNPC1.Location = new System.Drawing.Point(93, 19);
             this.rbTexNPC1.Name = "rbTexNPC1";
             this.rbTexNPC1.Size = new System.Drawing.Size(44, 17);
             this.rbTexNPC1.TabIndex = 8;
+            this.rbTexNPC1.TabStop = true;
             this.rbTexNPC1.Text = "Bad";
             this.rbTexNPC1.UseVisualStyleBackColor = true;
             // 
             // rbTexNPC2
             // 
             this.rbTexNPC2.AutoSize = true;
-            this.rbTexNPC2.Checked = true;
             this.rbTexNPC2.Location = new System.Drawing.Point(143, 19);
             this.rbTexNPC2.Name = "rbTexNPC2";
             this.rbTexNPC2.Size = new System.Drawing.Size(56, 17);
             this.rbTexNPC2.TabIndex = 9;
-            this.rbTexNPC2.TabStop = true;
             this.rbTexNPC2.Text = "Worse";
             this.rbTexNPC2.UseVisualStyleBackColor = true;
             // 
@@ -1126,7 +1126,7 @@
             this.Controls.Add(this.btnLowerQuality);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "MainForm";
-            this.Text = "LOWRES X4 v0.5.1 (by albanana)";
+            this.Text = "LOWRES X4 v0.5.2 (by albanana)";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);

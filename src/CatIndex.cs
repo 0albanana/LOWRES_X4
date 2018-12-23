@@ -423,9 +423,15 @@ namespace LOWRES_X4
 
         static private string GetChecksum(CatEntry e)
         {
-            // TODO: Actually compute checksum (if that is what that field contains)
-            // Currently X4 seems to ignore this value, so we just return the current one
-            return e.ChkSum;
+            using (var alg = System.Security.Cryptography.MD5.Create())
+            {
+                byte[] hash = alg.ComputeHash(e.Data);
+                var sb = new StringBuilder();
+                for (int i = 0; i < hash.Length; i++)
+                    sb.Append(hash[i].ToString("x2"));
+                
+                return sb.ToString();
+            }
         }
 
         private List<CatEntry> _entries;
