@@ -31,7 +31,6 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.btnOpen = new System.Windows.Forms.Button();
             this.lblFolder = new System.Windows.Forms.Label();
-            this.lbResult = new System.Windows.Forms.ListBox();
             this.btnLowerQuality = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.rbLODEnv0 = new System.Windows.Forms.RadioButton();
@@ -116,6 +115,7 @@
             this.rbTexStationI2 = new System.Windows.Forms.RadioButton();
             this.progressBar = new System.Windows.Forms.ProgressBar();
             this.label3 = new System.Windows.Forms.Label();
+            this.lbResults = new System.Windows.Forms.RichTextBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -155,16 +155,6 @@
             this.lblFolder.TabIndex = 1;
             this.lblFolder.Text = "Please select a folder";
             this.lblFolder.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // lbResult
-            // 
-            this.lbResult.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lbResult.FormattingEnabled = true;
-            this.lbResult.HorizontalScrollbar = true;
-            this.lbResult.Location = new System.Drawing.Point(13, 533);
-            this.lbResult.Name = "lbResult";
-            this.lbResult.Size = new System.Drawing.Size(769, 264);
-            this.lbResult.TabIndex = 2;
             // 
             // btnLowerQuality
             // 
@@ -1093,10 +1083,10 @@
             // 
             // progressBar
             // 
-            this.progressBar.Location = new System.Drawing.Point(13, 801);
+            this.progressBar.Location = new System.Drawing.Point(12, 801);
             this.progressBar.MarqueeAnimationSpeed = 50;
             this.progressBar.Name = "progressBar";
-            this.progressBar.Size = new System.Drawing.Size(766, 16);
+            this.progressBar.Size = new System.Drawing.Size(770, 16);
             this.progressBar.TabIndex = 7;
             // 
             // label3
@@ -1110,11 +1100,24 @@
             this.label3.TabIndex = 8;
             this.label3.Text = resources.GetString("label3.Text");
             // 
+            // lbResults
+            // 
+            this.lbResults.BackColor = System.Drawing.SystemColors.HighlightText;
+            this.lbResults.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.lbResults.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbResults.Location = new System.Drawing.Point(12, 533);
+            this.lbResults.Name = "lbResults";
+            this.lbResults.ReadOnly = true;
+            this.lbResults.Size = new System.Drawing.Size(770, 262);
+            this.lbResults.TabIndex = 9;
+            this.lbResults.Text = "";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(794, 821);
+            this.Controls.Add(this.lbResults);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.progressBar);
             this.Controls.Add(this.gbTextures);
@@ -1122,11 +1125,14 @@
             this.Controls.Add(this.cbSimulate);
             this.Controls.Add(this.lblFolder);
             this.Controls.Add(this.btnOpen);
-            this.Controls.Add(this.lbResult);
             this.Controls.Add(this.btnLowerQuality);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "MainForm";
-            this.Text = "LOWRES X4 v0.5.2 (by albanana)";
+            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
+            this.Text = "LOWRES X4 v0.6 (by albanana)";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
@@ -1171,7 +1177,6 @@
         private System.Windows.Forms.Button btnOpen;
         private System.Windows.Forms.Label lblFolder;
         private System.Windows.Forms.Button btnLowerQuality;
-        private System.Windows.Forms.ListBox lbResult;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.RadioButton rbLODEnv0;
         private System.Windows.Forms.RadioButton rbLODEnv3;
@@ -1255,6 +1260,7 @@
         private System.Windows.Forms.RadioButton rbTexFont2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.RadioButton rbTexFont0;
+        private System.Windows.Forms.RichTextBox lbResults;
     }
 }
 

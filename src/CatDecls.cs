@@ -3,11 +3,12 @@ namespace LOWRES_X4
     internal class CatEntry
     {
         public string Path;
+        public long OrigStreamPos;
         public long OrigSize;
         public string TimeStamp;
         public string ChkSum;
         public byte[] Data = null;
-        public bool Compressed;
+        public bool Compressed = false;
     }
 
     internal class LodEntry

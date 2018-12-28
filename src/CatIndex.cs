@@ -10,10 +10,17 @@ namespace LOWRES_X4
 {
     internal class CatIndex
     {
+        private List<CatEntry> _entries;
+        private FileStream _datStream;
+        private bool _updateCat = false;
+        private bool _updateDat = false;
+        private string _pathCat, _pathDat;
+
         public class Res
         {
             public int Count;
             public long RemovedBytes;
+            public long AddeddBytes;
         }
 
         public void Load(string pathCat, string pathDat)
@@ -41,8 +48,7 @@ namespace LOWRES_X4
             if (_entries.Count == 0)
                 throw new EndOfStreamException("could not parse .cat file");
 
-            if (!pathDat.EndsWith("_sig.dat"))
-                _datStream = new FileStream(pathDat, FileMode.Open, FileAccess.Read, FileShare.None);
+            _datStream = new FileStream(pathDat, FileMode.Open, FileAccess.Read, FileShare.None);
         }
 
         public void Close(bool updateFiles = true)
@@ -104,7 +110,10 @@ namespace LOWRES_X4
         {
             var res = new Res();
             if (DoRenameLOD(levels, res))
+            {
                 _updateCat = true;
+                _updateDat = true;
+            }
 
             return res;
         }
@@ -167,7 +176,7 @@ namespace LOWRES_X4
 
             return res;
         }
-        
+
         private bool DoReduceDDS(CatEntry e, TextureEntry.TECategory cat, long pos, int levels, Res res)
         {
             var oldData = new byte[e.OrigSize];
@@ -182,7 +191,7 @@ namespace LOWRES_X4
             {
                 if (e.Compressed)
                     oldData = Decompress(oldData);
-                
+
                 h = GCHandle.Alloc(oldData, GCHandleType.Pinned);
                 var img = DirectXTexNet.TexHelper.Instance.LoadFromDDSMemory(
                     h.AddrOfPinnedObject(),
@@ -193,7 +202,7 @@ namespace LOWRES_X4
                 if (imgCount > 1)
                 {
                     for (int i = 0; i < Math.Min(imgCount - 1, levels); ++i)
-                        img.FreeFirstImage();
+                        img.FreeFirstImage(); // TODO: replace loop
 
                     var ufs = img.SaveToDDSMemory(DirectXTexNet.DDS_FLAGS.NONE);
                     var newData = new byte[ufs.Length];
@@ -212,7 +221,7 @@ namespace LOWRES_X4
             }
             finally
             {
-                if (h.IsAllocated) 
+                if (h.IsAllocated)
                     h.Free();
             }
 
@@ -221,9 +230,10 @@ namespace LOWRES_X4
 
         private List<CatEntry> ParseCat(List<string> lines)
         {
-            var sep = new char[]{' '};
-
+            var sep = new char[] { ' ' };
             var list = new List<CatEntry>(lines.Count);
+            long currentPos = 0;
+
             foreach (var l in lines)
             {
                 var entry = new CatEntry();
@@ -247,7 +257,10 @@ namespace LOWRES_X4
                     entry.ChkSum = sl[3];
                 }
 
+                entry.OrigStreamPos = currentPos;
                 entry.Compressed = entry.Path.EndsWith(".gz");
+                currentPos += entry.OrigSize;
+
                 list.Add(entry);
             }
 
@@ -335,22 +348,26 @@ namespace LOWRES_X4
                 if (qlevel == 2 && le.Lod2Entry == null) qlevel = 1;
                 if (qlevel == 1 && le.Lod1Entry == null) continue;
 
-                le.Lod0Entry.Path = ReplaceString(le.Lod0Entry.Path, le.Lod0StrIdx, "_REP_L0_");
+                var lowestLODData = ReadEntry(le.Lod3Entry ?? le.Lod2Entry ?? le.Lod1Entry);
 
-                res.RemovedBytes += le.Lod0Entry.OrigSize;
-                ++count;
-                
                 if (qlevel == 3)
                 {
                     le.Lod3Entry.Path = ReplaceString(le.Lod3Entry.Path, le.Lod3StrIdx, "lod0.xmf");
-                    le.Lod1Entry.Path = ReplaceString(le.Lod1Entry.Path, le.Lod1StrIdx, "_REP_L1_");
+                    le.Lod0Entry.Path = ReplaceString(le.Lod1Entry.Path, le.Lod1StrIdx, "lod1.xmf");
+                    le.Lod0Entry.Data = lowestLODData;
+                    le.Lod1Entry.Path = ReplaceString(le.Lod1Entry.Path, le.Lod1StrIdx, "lod2.xmf");
+                    le.Lod1Entry.Data = lowestLODData;
 
-                    res.RemovedBytes += le.Lod1Entry.OrigSize;
-                    count += 2;
+                    res.AddeddBytes += lowestLODData.LongLength * 2;
+                    res.RemovedBytes += le.Lod1Entry.OrigSize + le.Lod0Entry.OrigSize;
+                    count += 3;
 
                     if (le.Lod2Entry != null)
                     {
-                        le.Lod2Entry.Path = ReplaceString(le.Lod2Entry.Path, le.Lod2StrIdx, "_REP_L2_");
+                        le.Lod2Entry.Path = ReplaceString(le.Lod2Entry.Path, le.Lod2StrIdx, "lod3.xmf");
+                        le.Lod2Entry.Data = lowestLODData;
+
+                        res.AddeddBytes += lowestLODData.LongLength;
                         res.RemovedBytes += le.Lod2Entry.OrigSize;
                         ++count;
                     }
@@ -358,31 +375,44 @@ namespace LOWRES_X4
                 else if (qlevel == 2)
                 {
                     le.Lod2Entry.Path = ReplaceString(le.Lod2Entry.Path, le.Lod2StrIdx, "lod0.xmf");
-                    le.Lod1Entry.Path = ReplaceString(le.Lod1Entry.Path, le.Lod1StrIdx, "_REP_L1_");
+                    le.Lod0Entry.Path = ReplaceString(le.Lod0Entry.Path, le.Lod0StrIdx, "lod1.xmf");
+                    le.Lod0Entry.Data = lowestLODData;
+                    le.Lod1Entry.Path = ReplaceString(le.Lod1Entry.Path, le.Lod1StrIdx, "lod2.xmf");
+                    le.Lod1Entry.Data = lowestLODData;
 
+                    res.AddeddBytes += lowestLODData.LongLength;
                     res.RemovedBytes += le.Lod1Entry.OrigSize;
                     count += 2;
 
                     if (le.Lod3Entry != null)
                     {
-                        le.Lod3Entry.Path = ReplaceString(le.Lod3Entry.Path, le.Lod3StrIdx, "lod1.xmf");
+                        le.Lod3Entry.Path = ReplaceString(le.Lod3Entry.Path, le.Lod3StrIdx, "lod3.xmf");
+                        le.Lod3Entry.Data = lowestLODData;
+
+                        res.AddeddBytes += lowestLODData.LongLength;
+                        res.RemovedBytes += le.Lod3Entry.OrigSize;
                         ++count;
                     }
                 }
                 else if (qlevel == 1)
                 {
                     le.Lod1Entry.Path = ReplaceString(le.Lod1Entry.Path, le.Lod1StrIdx, "lod0.xmf");
-                    ++count;
+                    le.Lod0Entry.Path = ReplaceString(le.Lod0Entry.Path, le.Lod0StrIdx, "lod1.xmf");
+                    le.Lod0Entry.Data = lowestLODData;
+
+                    res.AddeddBytes += lowestLODData.LongLength;
+                    res.RemovedBytes += le.Lod0Entry.OrigSize;
+                    count += 2;
 
                     if (le.Lod2Entry != null)
                     {
-                        le.Lod2Entry.Path = ReplaceString(le.Lod2Entry.Path, le.Lod2StrIdx, "lod1.xmf");
+                        le.Lod2Entry.Path = ReplaceString(le.Lod2Entry.Path, le.Lod2StrIdx, "lod2.xmf");
                         ++count;
                     }
 
                     if (le.Lod3Entry != null)
                     {
-                        le.Lod3Entry.Path = ReplaceString(le.Lod3Entry.Path, le.Lod3StrIdx, "lod2.xmf");
+                        le.Lod3Entry.Path = ReplaceString(le.Lod3Entry.Path, le.Lod3StrIdx, "lod3.xmf");
                         ++count;
                     }
                 }
@@ -391,6 +421,15 @@ namespace LOWRES_X4
             res.Count += count;
 
             return count > 0;
+        }
+
+        byte[] ReadEntry(CatEntry e)
+        {
+            _datStream.Seek(e.OrigStreamPos, SeekOrigin.Begin);
+            var data = new byte[e.OrigSize];
+            _datStream.Read(data, 0, (int)e.OrigSize);
+
+            return data;
         }
 
         static private string ReplaceString(string line, int idx, string rep)
@@ -429,16 +468,10 @@ namespace LOWRES_X4
                 var sb = new StringBuilder();
                 for (int i = 0; i < hash.Length; i++)
                     sb.Append(hash[i].ToString("x2"));
-                
+
                 return sb.ToString();
             }
         }
-
-        private List<CatEntry> _entries;
-        private FileStream _datStream;
-        private bool _updateCat = false;
-        private bool _updateDat = false;
-        private string _pathCat, _pathDat;
     }
 }
 

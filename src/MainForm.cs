@@ -10,7 +10,6 @@ namespace LOWRES_X4
 {
     public partial class MainForm : Form
     {
-        static readonly int MaxLineLength = 110;
         private string path_;
         private List<string> catFiles_;
 
@@ -66,8 +65,8 @@ namespace LOWRES_X4
                 LvlNPCs = rbTexNPC0.Checked ? 0 : rbTexNPC1.Checked ? 1 : rbTexNPC2.Checked ? 2 : 3,
                 LvlFX = rbTexFX0.Checked ? 0 : rbTexFX1.Checked ? 1 : rbTexFX2.Checked ? 2 : 3,
                 LvlEnvironments = rbTexEnv0.Checked ? 0 : rbTexEnv1.Checked ? 1 : rbTexEnv2.Checked ? 2 : 3,
-                LvlStationExteriors = rbLODStationE0.Checked ? 0 : rbLODStationE1.Checked ? 1 : rbLODStationE2.Checked ? 2 : 3,
-                LvlStationInteriors = rbLODStationI0.Checked ? 0 : rbLODStationI1.Checked ? 1 : rbLODStationI2.Checked ? 2 : 3,
+                LvlStationExteriors = rbTexStationE0.Checked ? 0 : rbTexStationE1.Checked ? 1 : rbTexStationE2.Checked ? 2 : 3,
+                LvlStationInteriors = rbTexStationI0.Checked ? 0 : rbTexStationI1.Checked ? 1 : rbTexStationI2.Checked ? 2 : 3,
                 LvlShips = rbTexShips0.Checked ? 0 : rbTexShips1.Checked ? 1 : rbTexShips2.Checked ? 2 : 3,
                 LvlMisc = rbTexMisc0.Checked ? 0 : rbTexMisc1.Checked ? 1 : rbTexMisc2.Checked ? 2 : 3
             };
@@ -83,7 +82,7 @@ namespace LOWRES_X4
                 return;
             }
 
-            lbResult.Items.Clear();
+            lbResults.Clear();
 
             if (!cbSimulate.Checked)
             {
@@ -98,14 +97,14 @@ namespace LOWRES_X4
             }
 
             if (!cbSimulate.Checked)
-                AddLogLine("Worsening X4's graphics ...");
+                AddLogLineInfo("Worsening X4's graphics ...");
             else
-                AddLogLine("[SIMULATION] Worsening X4's graphics ...");
+                AddLogLineInfo("[SIMULATION] Worsening X4's graphics ...");
 
             if (!texLevels.AllZero())
-                AddLogLine(">> Modifying textures is enabled, this can take a couple of minutes.");
+                AddLogLineInfo(">> Modifying textures is enabled, this can take a couple of minutes.");
             
-            AddLogLine();
+            AddLogLineInfo();
 
             btnOpen.Enabled = false;
             btnLowerQuality.Enabled = false;
@@ -130,6 +129,7 @@ namespace LOWRES_X4
                     if (finfoCat.Exists && finfoDat.Exists)
                     {
                         var catIndex = new CatIndex();
+                        bool processingDat = false;
 
                         try
                         {
@@ -142,46 +142,56 @@ namespace LOWRES_X4
                                 {
                                     totalRes.Count += res.Count;
                                     totalRes.RemovedBytes += res.RemovedBytes;
+                                    totalRes.AddeddBytes += res.AddeddBytes;
 
-                                    AddLogLine(string.Format("{0}:", finfoCat.Name));
-                                    AddLogLine(string.Format("\tMeshes: Modified {0} entries / removed {1:F3} MB", 
-                                        res.Count, res.RemovedBytes / (1024.0 * 1024.0)));
-                                    AddLogLine();
+                                    AddLogLineInfo(string.Format("{0}:", finfoCat.Name));
+                                    AddLogLineInfo(string.Format(
+                                        "\tMeshes: Modified {0} entries / removed {1:F3} MB / added {2:F3} MB", 
+                                        res.Count, 
+                                        res.RemovedBytes / (1024.0 * 1024.0), 
+                                        res.AddeddBytes / (1024.0 * 1024.0)));
+                                    AddLogLineInfo();
                                 }
                             }
 
-                            if (!texLevels.AllZero())
+                            if (!finfoDat.FullName.EndsWith("_sig.dat") && !texLevels.AllZero())
                             {
+                                processingDat = true;
+
                                 var res = catIndex.ProcessTextures(texLevels);
                                 if (res.Count > 0)
                                 {
                                     totalRes.Count += res.Count;
                                     totalRes.RemovedBytes += res.RemovedBytes;
+                                    totalRes.AddeddBytes += res.AddeddBytes;
 
-                                    AddLogLine(string.Format("{0}:", finfoDat.Name));
-                                    AddLogLine(string.Format("\tTextures: Modified {0} entries / removed {1:F3} MB (uncompressed)", 
-                                        res.Count, res.RemovedBytes / (1024.0 * 1024.0)));
-                                    AddLogLine();
+                                    AddLogLineInfo(string.Format("{0}:", finfoDat.Name));
+                                    AddLogLineInfo(string.Format(
+                                        "\tTextures: Modified {0} entries / removed {1:F3} MB (uncompressed)", 
+                                        res.Count,
+                                        res.RemovedBytes / (1024.0 * 1024.0)));
+                                    AddLogLineInfo();
                                 }
                             }
                         }
-                        catch (IOException)
+                        catch (UnauthorizedAccessException)
                         {
-                            AddLogLine(string.Format("{0}:", finfoCat.Name));
-                            AddLogLine("\tCould not open file to write (check write permissions)");
-                            AddLogLine();
+                            AddLogLineError(string.Format("{0}:", processingDat ? finfoDat.Name : finfoCat.Name));
+                            AddLogLineError("\tCould not open file to write (check write permissions)");
+                            AddLogLineError();
                         }
                         catch (Exception ex)
                         {
                             totalRes.Count = 0;
 
-                            AddLogLine(string.Format("{0}:", finfoCat.Name));
-                            AddLogLine(string.Format("\tException occured: {0}", ex));
-                            AddLogLine();
+                            AddLogLineError(string.Format("{0}:", processingDat ? finfoDat.Name : finfoCat.Name));
+                            AddLogLineError(string.Format("\tException occured: {0}", ex));
+                            AddLogLineError();
+
                             if (!cbSimulate.Checked)
-                                AddLogLine("Canceled further processing (contact developer ?)");
+                                AddLogLineError("Canceled further processing (contact developer ?)");
                             else
-                                AddLogLine("Canceled further processing, please restore using your backed up files (and contact developer ?)");
+                                AddLogLineError("Canceled further processing, please restore using your backed up files (and contact developer ?)");
 
                             catIndex.Close(false);
                             break;
@@ -191,20 +201,22 @@ namespace LOWRES_X4
                     }
                 }
 
-                lbResult.Invoke(new Action(() =>
+                lbResults.Invoke(new Action(() =>
                 {
                     progressBar.Value = progressBar.Maximum;
 
-                    AddLogLine();
-                    AddLogLine(" **************************************************************** ");
-                    AddLogLine("                             DONE.                                ");
+                    AddLogLineInfo();
+                    AddLogLineInfo(" ***************************************************************************** ");
+                    AddLogLineInfo("                                       DONE.                                   ");
 
                     if (totalRes.Count > 0)
-                        AddLogLine(string.Format(
-                            "       Total: Modified {0} entries / removed {1:F3} MB",
-                            totalRes.Count, totalRes.RemovedBytes / (1024.0 * 1024.0)));
+                        AddLogLineInfo(string.Format(
+                            "    Total: Modified {0} entries / removed {1:F3} MB / added {2:F3} MB",
+                            totalRes.Count,
+                            totalRes.RemovedBytes / (1024.0 * 1024.0),
+                            totalRes.AddeddBytes / (1024.0 * 1024.0)));
                     
-                    AddLogLine(" **************************************************************** ");
+                    AddLogLineInfo(" ***************************************************************************** ");
 
                     if (!cbSimulate.Checked)
                     {
@@ -223,30 +235,32 @@ namespace LOWRES_X4
             });
         }
 
-        private void AddLogLine(string text = null)
+        private void AddLogLineInfo(string text = null)
         {
-            lbResult.InvokeIfRequired(() =>
+            lbResults.InvokeIfRequired(() =>
             {
                 if (text == null)
-                    text = string.Empty;
-
-                if (text.Length > MaxLineLength)
-                {
-                    lbResult.Items.Add(text.Substring(0, MaxLineLength));
-                    text = text.Substring(MaxLineLength, text.Length - MaxLineLength);
-
-                    while (text.Length > MaxLineLength)
-                    {
-                        lbResult.Items.Add("\t" + text.Substring(0, MaxLineLength));
-                        text = text.Substring(MaxLineLength, text.Length - MaxLineLength);
-                    }
-
-                    lbResult.Items.Add("\t" + text);
-                }
+                    lbResults.AppendText("\n");
                 else
-                    lbResult.Items.Add(text);
+                    lbResults.AppendText(string.Format("{0}\n", text));
+            });
+        }
 
-                lbResult.SelectedIndex = lbResult.Items.Count - 1;
+        private void AddLogLineError(string text = null)
+        {
+            lbResults.InvokeIfRequired(() =>
+            {
+                if (text == null)
+                    lbResults.AppendText("\n");
+                else
+                {
+                    lbResults.SelectionStart = lbResults.TextLength;
+                    lbResults.SelectionLength = 0;
+
+                    lbResults.SelectionColor = System.Drawing.Color.Maroon;
+                    lbResults.AppendText(string.Format("{0}\n", text));
+                    lbResults.SelectionColor = lbResults.ForeColor;
+                }
             });
         }
     }
